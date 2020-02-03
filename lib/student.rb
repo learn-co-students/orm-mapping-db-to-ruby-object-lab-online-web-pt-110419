@@ -3,31 +3,70 @@ class Student
   attr_accessor :id, :name, :grade
 
   def self.new_from_db(row)
-   new_student = Student.new
-   new_student.id = row[0]
-   new_student.name = row[1]
-   new_student.grade = row[2]
-   new_student
+    new_student = Student.new
+    new_student.id = row[0]
+    new_student.name = row[1]
+    new_student.grade = row[2]
+    new_student
   end
 
+  def self.first_student_in_grade_10
+    arr = []
+    arr_instances = []
+  sql = <<-SQL
+          SELECT * FROM students WHERE grade = 10 LIMIT 1
+            SQL
+  arr = DB[:conn].execute(sql)
+  arr.each {|el| arr_instances << Student.new_from_db(el)}
+  first_student = arr_instances[0]
+  first_student
+end
+
+def self.first_X_students_in_grade_10(amount)
+arr = []
+arr_instances = []
+  sql = <<-SQL
+          SELECT * FROM students WHERE grade = 10
+            SQL
+  arr = DB[:conn].execute(sql)
+  arr.each_with_index {|el, index|
+    if index < amount
+      arr_instances << Student.new_from_db(el)
+    end
+  }
+  arr_instances
+end
 def self.all_students_in_grade_9
   arr = []
+  arr_instances = []
   sql = <<-SQL
   SELECT * FROM students WHERE grade = 9;
   SQL
   arr = DB[:conn].execute(sql)
-  arr
+  arr.each {|el| arr_instances << Student.new_from_db(el)}
+  arr_instances
 end
-
+def self.students_below_12th_grade
+ arr = []
+ arr_instances = []
+  sql = <<-SQL
+  SELECT * FROM students WHERE grade < 12;
+  SQL
+  arr = DB[:conn].execute(sql)
+  arr.each {|el| arr_instances << Student.new_from_db(el)}
+  arr_instances
+end
   def self.all
+    arr = []
+    arr_instances = []
     sql = <<-SQL
     SELECT * FROM students
     SQL
-    
-    all_rows = DB[:conn].execute(sql)
+    arr = DB[:conn].execute(sql)
+    arr.each{|el| arr_instances << Student.new_from_db(el)}
+    arr_instances
     # retrieve all the rows from the "Students" database
     # remember each row should be a new instance of the Student class
-    all_rows.each {|element| @@every_student << Student.new_from_db(element)}
   end
 
   def self.find_by_name(name)
