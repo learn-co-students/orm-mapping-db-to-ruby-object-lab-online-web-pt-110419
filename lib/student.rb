@@ -11,7 +11,7 @@ class Student
    new_student
   end
 
-  def find_by_name
+
   def self.all
     sql = <<-SQL
     SELECT * FROM students
@@ -24,6 +24,12 @@ class Student
   end
 
   def self.find_by_name(name)
+    sql = <<-SQL
+    SELECT name from students
+    SQL
+    names = DB[:conn].execute(sql)
+    names
+    binding.pry
     # find the student in the database given a name
     # return a new instance of the Student class
   end
