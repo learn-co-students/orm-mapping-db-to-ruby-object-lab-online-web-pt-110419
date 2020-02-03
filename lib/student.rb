@@ -2,7 +2,6 @@ require 'pry'
 class Student
   attr_accessor :id, :name, :grade
 
-
   def self.new_from_db(row)
    new_student = Student.new
    new_student.id = row[0]
@@ -11,6 +10,14 @@ class Student
    new_student
   end
 
+def self.all_students_in_grade_9
+  arr = []
+  sql = <<-SQL
+  SELECT * FROM students WHERE grade = 9;
+  SQL
+  arr = DB[:conn].execute(sql)
+  arr
+end
 
   def self.all
     sql = <<-SQL
@@ -20,16 +27,25 @@ class Student
     all_rows = DB[:conn].execute(sql)
     # retrieve all the rows from the "Students" database
     # remember each row should be a new instance of the Student class
-    all_rows
+    all_rows.each {|element| @@every_student << Student.new_from_db(element)}
   end
 
   def self.find_by_name(name)
+    instance = nil
     sql = <<-SQL
-    SELECT name from students
+      SELECT * from students
     SQL
-    names = DB[:conn].execute(sql)
-    names
-    binding.pry
+    
+    rows = DB[:conn].execute(sql)
+    
+    rows.each {|element| if element[1] == name
+                              instance = element  
+                            end
+                                }
+      if instance != nil
+        Student.new_from_db(instance)
+      end
+        
     # find the student in the database given a name
     # return a new instance of the Student class
   end
