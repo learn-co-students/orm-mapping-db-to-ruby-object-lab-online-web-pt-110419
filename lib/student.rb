@@ -9,7 +9,14 @@ class Student
     new_student.grade = row[2]
     new_student
   end
-
+  def all_students_in_grade_X(grade_x)
+    arr = []
+    arr_instances = []
+    sql = "SELECT * FROM students WHERE grade = #{grade_x} LIMIT 1"
+    arr = DB[:conn].execute(sql)
+    arr.each {|el| arr_instances << Student.new_from_db(el)}
+    arr_instances
+  end
   def self.first_student_in_grade_10
     arr = []
     arr_instances = []
